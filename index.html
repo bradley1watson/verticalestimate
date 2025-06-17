@@ -4,34 +4,47 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Video Deliverables Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="container">
+    <div class="logo-container">
+        <img src="Vertical_Wordmark_White_1200x288.png" alt="Vertical Logo" class="logo">
+    </div>
+    <div id="video-calculator">
+        <h3>Video Deliverables Calculator</h3>
+        <label>Video Length (minutes):<br>
+        <input type="number" id="videoLength" min="1">
+        </label>
 
-<div id="video-calculator" style="max-width: 500px; margin: auto; font-family: sans-serif;">
-<h3>Video Deliverables Calculator</h3>
-<label>Video Length (minutes):<br>
-<input type="number" id="videoLength" min="1" style="width: 100%; padding: 5px;">
-</label><br><br>
+        <label>Number of Videos:<br>
+        <input type="number" id="videoCount" min="1">
+        </label>
 
-<label>Number of Videos:<br>
-<input type="number" id="videoCount" min="1" style="width: 100%; padding: 5px;">
-</label><br><br>
+        <button onclick="calculateDeliverables()">Calculate</button>
 
-<button onclick="calculateDeliverables()" style="padding: 10px 20px;">Calculate</button><br><br>
-
-<div id="results" style="border-top: 1px solid #ccc; padding-top: 15px; display:none;">
-<p><strong>Estimated Deliverables:</strong></p>
-<ul>
-<li><span id="mainVideos"></span> full video(s)</li>
-<li><span id="reels"></span> short (:30) reel(s)</li>
-<li><span id="images"></span> image(s)</li>
-<li><strong><span id="totalContent"></span> total content pieces</strong></li>
-<li><em>Production Time:</em> <span id="totalHours"></span> hours</li>
-<li><strong>Total Estimated Quote:</strong> <span id="priceQuote"></span></li>
-<li><strong>Cost per Content Piece:</strong> <span id="costPerPiece"></span></li>
-</ul>
-</div>
+        <div id="results">
+            <p><strong>Estimated Deliverables:</strong></p>
+            <ul>
+                <li><span id="mainVideos"></span> full video(s)</li>
+                <li><span id="reels"></span> short (:30) reel(s)</li>
+                <li><span id="images"></span> image(s)</li>
+                <li><strong><span id="totalContent"></span> total content pieces</strong></li>
+                <li class="production-time-row">
+                    <span class="production-time-label"><em>Production Time:</em></span>
+                    <span class="production-time-value-group">
+                        <span id="totalHours" class="production-time-value"></span>
+                        <span class="production-time-hours">hours</span>
+                    </span>
+                </li>
+                <li><strong>Total Estimated Quote:</strong> <span id="priceQuote"></span></li>
+                <li><strong>Cost per Content Piece:</strong> <span id="costPerPiece"></span></li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <script>
