@@ -40,14 +40,58 @@
                         <span class="production-time-hours">hours</span>
                     </span>
                 </li>
+                <li class="production-time-row">
+                    <span class="production-time-label"><em>Cost per Content Piece:</em></span>
+                    <span class="production-time-value-group">
+                        <span id="costPerPiece" class="production-time-value"></span>
+                    </span>
+                </li>
                 <li><strong>Total Estimated Quote:</strong> <span id="priceQuote"></span></li>
-                <li><strong>Cost per Content Piece:</strong> <span id="costPerPiece"></span></li>
             </ul>
+            <button id="generateQuoteBtn" onclick="showQuoteModal()" style="margin-top: 20px;">Generate Formal Quote</button>
         </div>
     </div>
 </div>
 
+<!-- Modal HTML -->
+<div id="quoteModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Company Details</h2>
+        <form id="quoteForm">
+            <div class="form-group">
+                <label for="companyName">Company Name:</label>
+                <input type="text" id="companyName" required>
+            </div>
+            <div class="form-group">
+                <label for="clientName">Client Name:</label>
+                <input type="text" id="clientName" required>
+            </div>
+            <div class="form-group">
+                <label for="clientEmail">Client Email:</label>
+                <input type="email" id="clientEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="quoteDate">Quote Date:</label>
+                <input type="date" id="quoteDate" required>
+            </div>
+            <button type="button" onclick="generatePDF()">Generate PDF Quote</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 <script>
+// Add this at the beginning of your script section
+const poppinsFont = {
+    normal: 'https://cdn.jsdelivr.net/npm/@fontsource/poppins/files/poppins-latin-400-normal.woff2',
+    bold: 'https://cdn.jsdelivr.net/npm/@fontsource/poppins/files/poppins-latin-700-normal.woff2',
+    italic: 'https://cdn.jsdelivr.net/npm/@fontsource/poppins/files/poppins-latin-400-italic.woff2',
+    bolditalic: 'https://cdn.jsdelivr.net/npm/@fontsource/poppins/files/poppins-latin-700-italic.woff2'
+};
+
+
 function calculateDeliverables() {
 var length = parseFloat(document.getElementById("videoLength").value);
 var count = parseInt(document.getElementById("videoCount").value);
@@ -75,6 +119,164 @@ document.getElementById("costPerPiece").innerText = "$" + costPerPiece.toFixed(2
 
 document.getElementById("results").style.display = "block";
 }
+
+// Wait for the document to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Loading logo...');
+    loadLogo()
+        .then(() => {
+            console.log('Logo loaded successfully');
+        })
+        .catch(error => {
+            console.error('Error loading logo:', error);
+        });
+    
+    // Initialize the close button functionality
+    const closeBtn = document.querySelector('.close');
+    if (closeBtn) {
+        closeBtn.onclick = function() {
+            const modal = document.getElementById('quoteModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+    }
+
+    // Initialize the generate quote button
+    const generateQuoteBtn = document.getElementById('generateQuoteBtn');
+    if (generateQuoteBtn) {
+        generateQuoteBtn.onclick = function() {
+            showQuoteModal();
+        }
+    }
+});
+
+function showQuoteModal() {
+    console.log('Showing quote modal...'); // Debug log
+    const modal = document.getElementById('quoteModal');
+    if (!modal) {
+        console.error('Quote modal not found');
+        return;
+    }
+    modal.style.display = 'block';
+    
+    // Set default date to today
+    const dateInput = document.getElementById('quoteDate');
+    if (dateInput) {
+        dateInput.valueAsDate = new Date();
+    }
+}
+
+function generatePDF() {
+    if (typeof window.jspdf === 'undefined') {
+        alert('PDF generation library is not loaded. Please try again in a moment.');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+        unit: 'pt',
+        format: 'a4'
+    });
+
+    // Margins and layout
+    const left = 40;
+    let y = 40;
+
+    // Header
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text('VIDEO PRODUCTION QUOTE', doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+    y += 30;
+
+    // Company and Client Info
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('From:', left, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Vertical Video Marketing, LLC.', left + 35, y);
+    y += 14;
+    doc.text('730 Energy Center Blvd Ste 1402D', left + 35, y);
+    y += 14;
+    doc.text('Northport, AL 35473', left + 35, y);
+    y += 14;
+    doc.text(' ', left + 35, y); // Spacer
+
+    y -= 28; // Move up to align "To:" on the right
+    doc.setFont('helvetica', 'bold');
+    doc.text('To:', 320, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(document.getElementById('companyName').value, 355, y);
+    y += 14;
+    doc.text(`Attn: ${document.getElementById('clientName').value}`, 355, y);
+    y += 14;
+    doc.text(document.getElementById('clientEmail').value, 355, y);
+    y += 28;
+
+    // Quote Details
+    doc.setFont('helvetica', 'bold');
+    doc.text('Quote Date:', left, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(document.getElementById('quoteDate').value, left + 70, y);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Quote #:', 320, y);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`, 370, y);
+    y += 24;
+
+    // Deliverables Table
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Deliverables', left, y);
+    y += 10;
+
+    doc.autoTable({
+        startY: y,
+        head: [['Item', 'Quantity', 'Unit Price', 'Total']],
+        body: [
+            ['Full Videos', document.getElementById('mainVideos').innerText, '$175/hr', `$${(parseFloat(document.getElementById('totalHours').innerText) * 175).toFixed(2)}`],
+            ['Short Reels', document.getElementById('reels').innerText, 'Included', '-'],
+            ['Images', document.getElementById('images').innerText, 'Included', '-']
+        ],
+        theme: 'grid',
+        styles: { font: 'helvetica', fontSize: 10, cellPadding: 4 },
+        headStyles: { fillColor: [45, 55, 72], textColor: 255, fontStyle: 'bold' },
+        margin: { left, right: left }
+    });
+
+    y = doc.lastAutoTable.finalY + 20;
+
+    // Summary
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Summary', left, y);
+    y += 16;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Total Production Hours: ${document.getElementById('totalHours').innerText}`, left, y);
+    y += 14;
+    doc.text(`Total Content Pieces: ${document.getElementById('totalContent').innerText}`, left, y);
+    y += 14;
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Total Amount: ${document.getElementById('priceQuote').innerText}`, left, y);
+    y += 24;
+
+    // Terms
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.text('Terms: Payment due in 30 days. All prices in USD. Quote valid for 30 days.', left, y);
+
+    // Footer
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text('Thank you for choosing Vertical Productions', doc.internal.pageSize.getWidth() / 2, 820, { align: 'center' });
+    doc.text('www.verticalproductions.com | contact@verticalproductions.com', doc.internal.pageSize.getWidth() / 2, 832, { align: 'center' });
+
+    doc.save(`quote_${document.getElementById('companyName').value}_${document.getElementById('quoteDate').value}.pdf`);
+    document.getElementById('quoteModal').style.display = 'none';
+}
 </script>
 
 </body>
+</html>
