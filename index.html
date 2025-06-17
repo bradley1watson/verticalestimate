@@ -271,7 +271,7 @@ function generatePDF() {
     doc.setFontSize(8);
     doc.setTextColor(128, 128, 128);
     doc.text('Thank you for choosing Vertical Productions', doc.internal.pageSize.getWidth() / 2, 820, { align: 'center' });
-    doc.text('www.verticalproductions.com | contact@verticalproductions.com', doc.internal.pageSize.getWidth() / 2, 832, { align: 'center' });
+    doc.text('withvertical.com', doc.internal.pageSize.getWidth() / 2, 832, { align: 'center' });
 
     doc.save(`quote_${document.getElementById('companyName').value}_${document.getElementById('quoteDate').value}.pdf`);
     document.getElementById('quoteModal').style.display = 'none';
