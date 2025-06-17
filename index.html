@@ -1,0 +1,62 @@
+function video_deliverables_calculator_shortcode() {
+ob_start();
+?>
+<div id="video-calculator" style="max-width: 500px; margin: auto; font-family: sans-serif;">
+<h3>Video Deliverables Calculator</h3>
+<label>Video Length (minutes):<br>
+<input type="number" id="videoLength" min="1" style="width: 100%; padding: 5px;">
+</label><br><br>
+
+<label>Number of Videos:<br>
+<input type="number" id="videoCount" min="1" style="width: 100%; padding: 5px;">
+</label><br><br>
+
+<button onclick="calculateDeliverables()" style="padding: 10px 20px;">Calculate</button><br><br>
+
+<div id="results" style="border-top: 1px solid #ccc; padding-top: 15px; display:none;">
+<p><strong>Estimated Deliverables:</strong></p>
+<ul>
+<li><span id="mainVideos"></span> full video(s)</li>
+<li><span id="reels"></span> short (:30) reel(s)</li>
+<li><span id="images"></span> image(s)</li>
+<li><strong><span id="totalContent"></span> total content pieces</strong></li>
+<li><em>Production Time:</em> <span id="totalHours"></span> hours</li>
+<li><strong>Total Estimated Quote:</strong> <span id="priceQuote"></span></li>
+<li><strong>Cost per Content Piece:</strong> <span id="costPerPiece"></span></li>
+</ul>
+</div>
+</div>
+
+<script>
+function calculateDeliverables() {
+var length = parseFloat(document.getElementById("videoLength").value);
+var count = parseInt(document.getElementById("videoCount").value);
+
+if (isNaN(length) || isNaN(count) || length <= 0 || count <= 0) {
+alert("Please enter valid numbers for both fields.");
+return;
+}
+
+var totalMinutes = length * count;
+var totalHours = totalMinutes * 12.4;
+var reels = Math.floor(totalMinutes / 2);
+var images = Math.floor(totalHours / 10) * 5;
+var totalContent = count + reels + images;
+var priceQuote = totalHours * 175;
+var costPerPiece = totalContent > 0 ? priceQuote / totalContent : 0;
+
+document.getElementById("mainVideos").innerText = count;
+document.getElementById("reels").innerText = reels;
+document.getElementById("images").innerText = images;
+document.getElementById("totalContent").innerText = totalContent;
+document.getElementById("totalHours").innerText = totalHours.toFixed(1);
+document.getElementById("priceQuote").innerText = "$" + priceQuote.toFixed(2).toLocaleString();
+document.getElementById("costPerPiece").innerText = "$" + costPerPiece.toFixed(2).toLocaleString();
+
+document.getElementById("results").style.display = "block";
+}
+</script>
+<?php
+return ob_get_clean();
+}
+add_shortcode('video_deliverables_calculator', 'video_deliverables_calculator_shortcode');
